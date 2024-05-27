@@ -40,7 +40,6 @@ app.get("/users/:id", (req, res) => {
 	});
 });
 
-
 app.post("/users", (req, res) => {
 	const { username, password } = req.body;
 	console.log(req.body);
@@ -67,6 +66,69 @@ app.post("/users", (req, res) => {
 		);
 	}
 });
+
+app.put("/users/:id", (req, res) => {
+	const id = req.params.id;
+	const { username, password } = req.body;
+	if (
+		username == "undefined" ||
+		username == "" ||
+		password == "undefined" ||
+		password == ""
+	){
+		res.send("Dados incompletos");
+		return;
+	}else{
+		db.run(
+			"UPDATE users SET username = ?, password = ? WHERE id = ?",
+			[username, password, id],
+			(error) => {
+				if (error) {
+					res.send(error);
+					return;
+				}
+				res.send(`Usuário ${username} atualizado com sucesso`);
+			},
+		);
+	}
+})
+
+app.patch("/users/:id", (req, res) =>{
+	const id = req.params.id;
+	const { username, password } = req.body;
+	if (
+		username == "undefined" ||
+		username == "" ||
+		password == "undefined" ||
+		password == ""
+	){
+		res.send("Dados incompletos");
+		return;
+	}else{
+		db.run(
+			"UPDATE users SET username = ?, password = ? WHERE id = ?",
+			[username, password, id],
+			(error) => {
+				if (error) {
+					res.send(error);
+					return;
+				}
+				res.send(`Usuário ${username} atualizado com sucesso`);
+			},
+		);
+	}
+})
+
+app.delete("/users/:id", (req, res) =>{
+	const id = req.params.id;
+	db.run("DELETE FROM users WHERE id = ?", id, (error) => {
+		if (error) {
+			res.send(error);
+			return;
+		}
+		res.send(`Usuário ${id} deletado com sucesso`);
+	});
+})
 
 app.listen(port, () => {
 	console.log(`Servidor rodando na porta ${port}`);
