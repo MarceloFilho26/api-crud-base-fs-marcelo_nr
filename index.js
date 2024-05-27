@@ -7,7 +7,7 @@ const db = new sqlite.Database("database.db");
 
 db.serialize(() => {
 	db.run(
-		"CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, password TEXT)",
+		"CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, password TEXT, cpf VARCHAR, telefone TEXT, email TEXT)",
 	);
 
 	// db.run("INSERT INTO users (username, password) VALUES ('admin', 'admin')")
@@ -32,7 +32,7 @@ app.get("/users", (req, res) => {
 
 app.get("/users/:id", (req, res) => {
 	const id = req.params.id;
-	db.all("SELECT * FROM users WHERE id = ?", id, (error, rows) => {
+	db.get("SELECT * FROM users WHERE id = ?", id, (error, rows) => {
 		if (error) {
 			res.send(error);
 		}
@@ -41,21 +41,27 @@ app.get("/users/:id", (req, res) => {
 });
 
 app.post("/users", (req, res) => {
-	const { username, password } = req.body;
+	const { username, password, cpf, telefone, email } = req.body;
 	console.log(req.body);
 
 	if (
-		username == "undefined" ||
+		username == undefined ||
 		username == "" ||
-		password == "undefined" ||
-		password == ""
+		password == undefined ||
+		password == "" ||
+		cpf == undefined ||
+		cpf == "" ||
+		telefone == undefined ||
+		telefone == "" ||
+		email == undefined ||
+		email == ""
 	) {
 		res.send("Dados incompletos");
 		return;
 	} else {
 		db.run(
-			"INSERT INTO users (username, password) VALUES (?, ?)",
-			[username, password],
+			"INSERT INTO users (username, password, cpf, telefone, email) VALUES (?, ?, ?, ?, ?)",
+			[username, password, cpf, telefone, email],
 			(error) => {
 				if (error) {
 					res.send(error);
@@ -74,14 +80,20 @@ app.put("/users/:id", (req, res) => {
 		username == "undefined" ||
 		username == "" ||
 		password == "undefined" ||
-		password == ""
-	){
+		password == "" ||
+		cpf == "undefined" ||
+		cpf == "" ||
+		telefone == "undefined" ||
+		telefone == "" ||
+		email == "undefined" ||
+		email == ""
+	) {
 		res.send("Dados incompletos");
 		return;
-	}else{
+	} else {
 		db.run(
-			"UPDATE users SET username = ?, password = ? WHERE id = ?",
-			[username, password, id],
+			"UPDATE users SET username = ?, password = ?, cpf = ?, telefone = ?, email = ? WHERE id = ?",
+			[username, password, cpf, telefone, email, id],
 			(error) => {
 				if (error) {
 					res.send(error);
@@ -91,23 +103,29 @@ app.put("/users/:id", (req, res) => {
 			},
 		);
 	}
-})
+});
 
-app.patch("/users/:id", (req, res) =>{
+app.patch("/users/:id", (req, res) => {
 	const id = req.params.id;
 	const { username, password } = req.body;
 	if (
 		username == "undefined" ||
 		username == "" ||
 		password == "undefined" ||
-		password == ""
-	){
+		password == "" ||
+		cpf == "undefined" ||
+		cpf == "" ||
+		telefone == "undefined" ||
+		telefone == "" ||
+		email == "undefined" ||
+		email == ""
+	) {
 		res.send("Dados incompletos");
 		return;
-	}else{
+	} else {
 		db.run(
-			"UPDATE users SET username = ?, password = ? WHERE id = ?",
-			[username, password, id],
+			"UPDATE users SET username = ?, password = ?, cpf = ?, telefone = ?, email = ? WHERE id = ?",
+			[username, password, cpf, telefone, email, id],
 			(error) => {
 				if (error) {
 					res.send(error);
@@ -117,9 +135,9 @@ app.patch("/users/:id", (req, res) =>{
 			},
 		);
 	}
-})
+});
 
-app.delete("/users/:id", (req, res) =>{
+app.delete("/users/:id", (req, res) => {
 	const id = req.params.id;
 	db.run("DELETE FROM users WHERE id = ?", id, (error) => {
 		if (error) {
@@ -128,7 +146,7 @@ app.delete("/users/:id", (req, res) =>{
 		}
 		res.send(`Usuário ${id} deletado com sucesso`);
 	});
-})
+});
 
 app.listen(port, () => {
 	console.log(`Servidor rodando na porta ${port}`);
